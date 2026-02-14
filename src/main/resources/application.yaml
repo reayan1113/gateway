@@ -1,0 +1,110 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: api-gateway
+  cloud:
+    gateway:
+      routes:
+        # Auth Service (Public - No JWT Required)
+        - id: auth-service
+          uri: http://localhost:8081
+          predicates:
+            - Path=/api/auth/**
+          filters:
+            - RewritePath=/api/auth/(?<segment>.*), /${segment}
+
+        # Menu Service
+        - id: menu-service
+          uri: http://localhost:8082
+          predicates:
+            - Path=/api/menu/**
+          filters:
+            - RewritePath=/api/menu/(?<segment>.*), /api/menu/${segment}
+
+        # Menu Service - Admin Menu
+        - id: admin-menu-service
+          uri: http://localhost:8082
+          predicates:
+            - Path=/api/admin/menu/**
+          filters:
+            - RewritePath=/api/admin/menu/(?<segment>.*), /api/admin/menu/${segment}
+
+        # Category Service - Public (No Auth)
+        - id: category-service-public
+          uri: http://localhost:8082
+          predicates:
+            - Path=/api/categories/**
+          filters:
+            - RewritePath=/api/categories/(?<segment>.*), /api/categories/${segment}
+
+        # Category Service - Admin
+        - id: category-service-admin
+          uri: http://localhost:8082
+          predicates:
+            - Path=/api/admin/categories/**
+          filters:
+            - RewritePath=/api/admin/categories/(?<segment>.*), /api/admin/categories/${segment}
+
+        # Media Service (Menu Service)
+        - id: media-service
+          uri: http://localhost:8082
+          predicates:
+            - Path=/api/media/**
+          filters:
+            - RewritePath=/api/media/(?<segment>.*), /api/media/${segment}
+
+        # Order Service
+        - id: order-service
+          uri: http://localhost:8083
+          predicates:
+            - Path=/api/orders/**
+
+        # Analytics Service
+        - id: analytics-service
+          uri: http://localhost:8084
+          predicates:
+            - Path=/api/analytics/**
+
+        # KDS Service
+        - id: kds-service
+          uri: http://localhost:8085
+          predicates:
+            - Path=/api/kds/**
+
+      # Global CORS Configuration
+      globalcors:
+        corsConfigurations:
+          '[/**]':
+            allowedOrigins:
+              - "http://localhost:3000"
+              - "http://localhost:3001"
+            allowedMethods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+              - PATCH
+              - OPTIONS
+            allowedHeaders:
+              - "*"
+            exposedHeaders:
+              - X-Correlation-Id
+              - X-Service-Name
+            allowCredentials: true
+            maxAge: 3600
+
+# JWT Configuration
+jwt:
+  secret: 7d31f0ead336068cac57f475bdb722e69bb452d2
+
+# Public paths that don't require JWT (comma-separated)
+gateway:
+  public-paths: /api/auth/**,/api/categories/**,/api/menu/**,/api/media/**,/api/orders/active
+
+# Logging
+logging:
+  level:
+    org.springframework.cloud.gateway: DEBUG
+    com.example.api_gateway: DEBUG
