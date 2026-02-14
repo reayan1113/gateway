@@ -1,0 +1,37 @@
+# Build artifacts
+target/
+!target/*.jar
+
+# IDE files
+.idea/
+.vscode/
+*.iml
+*.iws
+*.ipr
+
+# Git
+.git/
+.gitignore
+
+# Maven
+.mvn/
+mvnw
+mvnw.cmd
+
+# Documentation
+*.md
+HELP.md
+README.md
+ARCHITECTURE_DIAGRAM.md
+FIX_CATEGORY_404_ERROR.md
+GATEWAY_IMPLEMENTATION_GUIDE.md
+IMPLEMENTATION_SUMMARY.md
+QUICK_START.md
+
+# Test
+src/test/
+
+# Misc
+.DS_Store
+*.log
+
