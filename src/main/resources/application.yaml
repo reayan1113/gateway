@@ -99,7 +99,7 @@ jwt:
 
 # Public paths that don't require JWT (comma-separated)
 gateway:
-  public-paths: ${PUBLIC_PATHS:/api/auth/**,/api/categories/**,/api/menu/**,/api/media/**,/api/orders/active}
+  public-paths: ${PUBLIC_PATHS:/api/auth/**,/api/categories/**,/api/menu/**,/api/media/**,/api/orders/active,/actuator/**}
 
 # Logging
 logging:
