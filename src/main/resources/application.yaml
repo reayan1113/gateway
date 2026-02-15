@@ -57,7 +57,7 @@ spring:
 
         # Order Service
         - id: order-service
-          uri: ${ORDER_SERVICE_URL:http://order-service:8083}
+          uri: ${ORDER_SERVICE_URL:http://order-service}
           predicates:
             - Path=/api/orders/**
 
