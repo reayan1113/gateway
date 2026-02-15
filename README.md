@@ -1,54 +1,262 @@
 # API Gateway - Restaurant Management System
 
-Spring Cloud Gateway for routing and authentication.
+Spring Cloud Gateway for routing and JWT authentication in a microservices architecture.
 
-## Prerequisites
-- JDK 17
-- Maven
-- Docker
-- Azure CLI
+## Tech Stack
+- Java 17
+- Spring Boot 3.x
+- Spring Cloud Gateway
+- Docker (Multi-stage build)
+- Azure Container Apps
+
+---
+
+## 🚀 Azure Deployment
+
+### Prerequisites
+- Azure CLI installed
 - Azure subscription
-- GitHub account
+- GitHub repository
 
-## Local Development
+### Step 1: Run Setup Script
 
-### 1. Set Environment Variables
 ```powershell
-$env:JWT_SECRET="your-test-secret"
-$env:AUTH_SERVICE_URL="http://localhost:8081"
-$env:MENU_SERVICE_URL="http://localhost:8082"
-$env:ORDER_SERVICE_URL="http://localhost:8083"
-$env:ANALYTICS_SERVICE_URL="http://localhost:8084"
-$env:KDS_SERVICE_URL="http://localhost:8085"
+.\setup-azure.ps1
 ```
 
-### 2. Run Application
+This creates:
+- Azure Resource Group
+- Azure Container Registry (ACR)
+- Container Apps Environment
+- Container App
+- Service Principal for GitHub Actions
+
+### Step 2: Configure GitHub Secrets
+
+Go to: **GitHub Repo → Settings → Secrets and variables → Actions**
+
+Add these **5 secrets** (values from setup script output):
+
+| Secret Name | Example Value |
+|-------------|---------------|
+| `AZURE_CREDENTIALS` | `{...JSON from script...}` |
+| `ACR_NAME` | `acrrestaurantgateway01` |
+| `RESOURCE_GROUP` | `rg-restaurant-gateway` |
+| `CONTAINER_APP_NAME` | `api-gateway` |
+| `IMAGE_NAME` | `api-gateway` |
+
+### Step 3: Push to GitHub
+
 ```bash
+git add .
+git commit -m "Deploy to Azure"
+git push origin main
+```
+
+GitHub Actions automatically:
+1. Builds Docker image (with Maven inside)
+2. Pushes to Azure Container Registry
+3. Deploys to Azure Container Apps
+
+### Step 4: Verify Deployment
+
+```powershell
+# Get app URL
+az containerapp show `
+  --name api-gateway `
+  --resource-group rg-restaurant-gateway `
+  --query properties.configuration.ingress.fqdn -o tsv
+
+# Test health endpoint
+curl https://<your-app-url>/actuator/health
+```
+
+---
+
+## 💻 Local Development
+
+### Run with Maven
+```powershell
+$env:JWT_SECRET = "test-secret-key"
 mvn spring-boot:run
 ```
 
-### 3. Test
+### Run with Docker
+```bash
+docker build -t api-gateway .
+docker run -p 8080:8080 -e JWT_SECRET=test-secret api-gateway
+```
+
+### Test
 ```bash
 curl http://localhost:8080/actuator/health
 ```
 
+---
+
+## 📋 Architecture
+
+### Routes
+- `/api/auth/**` → Authentication Service (public)
+- `/api/menu/**` → Menu Service
+- `/api/orders/**` → Order Service  
+- `/api/analytics/**` → Analytics Service
+- `/api/kds/**` → Kitchen Display Service
+
+### Security
+- JWT validation on protected routes
+- Role-based authorization filters
+- Public paths: `/api/auth/**`, `/api/categories/**`, `/actuator/**`
+
+### Monitoring
+- Health: `/actuator/health`
+- Metrics: `/actuator/metrics`
+- Liveness: `/actuator/health/liveness`
+- Readiness: `/actuator/health/readiness`
+
+---
+
+## 🔧 Environment Variables
+
+| Variable | Description | Required |
+|----------|-------------|----------|
+| `JWT_SECRET` | JWT signing secret | Yes |
+| `AUTH_SERVICE_URL` | Authentication service URL | Yes |
+| `MENU_SERVICE_URL` | Menu service URL | Yes |
+| `ORDER_SERVICE_URL` | Order service URL | Yes |
+| `ANALYTICS_SERVICE_URL` | Analytics service URL | No |
+| `KDS_SERVICE_URL` | KDS service URL | No |
+
+Set in Azure:
+```powershell
+az containerapp update `
+  --name api-gateway `
+  --resource-group rg-restaurant-gateway `
+  --set-env-vars "JWT_SECRET=your-secret" "AUTH_SERVICE_URL=https://auth.example.com"
+```
+
+---
+
+## 🐛 Troubleshooting
+
+### GitHub Actions fails
+- Verify all 5 secrets are configured correctly
+- Ensure Service Principal has Contributor role on Resource Group
+
+### Container not starting
+```powershell
+az containerapp logs show `
+  --name api-gateway `
+  --resource-group rg-restaurant-gateway `
+  --follow
+```
+
+### Health check failing
+- Verify Spring Boot Actuator is enabled
+- Check application logs for startup errors
+
+
+## Tech Stack
+- Java 17
+- Spring Boot 3.x
+- Spring Cloud Gateway
+- Docker
+- Azure Container Apps
+
+## Local Development
+
+### Prerequisites
+- JDK 17
+- Maven
+- Docker
+
+### Run Locally
+```powershell
+# Set environment variables
+$env:JWT_SECRET="your-secret-key"
+$env:AUTH_SERVICE_URL="http://localhost:8081"
+$env:MENU_SERVICE_URL="http://localhost:8082"
+$env:ORDER_SERVICE_URL="http://localhost:8083"
+
+# Run application
+mvn spring-boot:run
+
+# Test
+curl http://localhost:8080/actuator/health
+```
+
+### Run with Docker
+```bash
+docker build -t api-gateway .
+docker run -p 8080:8080 -e JWT_SECRET=your-secret api-gateway
+```
+
 ## Azure Deployment
 
-### Step 1: Install Azure CLI
+### Step 1: Create Azure Resources
+Run the setup script to create all required Azure resources:
 ```powershell
-winget install -e --id Microsoft.AzureCLI
-az login
+.\setup-azure.ps1
 ```
 
-### Step 2: Set Variables (Update These!)
-```powershell
-$RESOURCE_GROUP="rg-restaurant-gateway"
-$LOCATION="eastus"
-$ACR_NAME="acrrestaurantapp"  # Must be globally unique, lowercase only
-$CONTAINER_APP_ENV="env-restaurant-app"
-$CONTAINER_APP_NAME="api-gateway"
+This creates:
+- Resource Group
+- Azure Container Registry (ACR)
+- Container App Environment
+- Container App
+- Service Principal for GitHub Actions
+
+### Step 2: Configure GitHub Secrets
+Add these secrets in GitHub: **Settings → Secrets and variables → Actions**
+
+| Secret | Description |
+|--------|-------------|
+| `AZURE_CREDENTIALS` | Service principal JSON from setup script |
+| `ACR_NAME` | Azure Container Registry name |
+| `RESOURCE_GROUP` | Azure resource group name |
+| `CONTAINER_APP_NAME` | Container app name |
+| `IMAGE_NAME` | Docker image name (e.g., api-gateway) |
+| `JWT_SECRET` | JWT secret key |
+
+### Step 3: Deploy
+Push to main branch to trigger automatic deployment:
+```bash
+git push origin main
 ```
 
+GitHub Actions will:
+1. Build Docker image with multi-stage build
+2. Push to Azure Container Registry
+3. Deploy to Azure Container Apps
+
+### Step 4: Verify
+```powershell
+# Get app URL
+az containerapp show --name api-gateway --resource-group rg-restaurant-gateway --query properties.configuration.ingress.fqdn -o tsv
+
+# Test health endpoint
+curl https://<your-app-url>/actuator/health
+```
+
+## Architecture
+
+### Routes
+- `/api/auth/**` - Authentication Service (public)
+- `/api/menu/**` - Menu Service
+- `/api/orders/**` - Order Service
+- `/api/analytics/**` - Analytics Service
+- `/api/kds/**` - Kitchen Display Service
+
+### Security
+- JWT validation on protected routes
+- Role-based authorization
+- Public paths: `/api/auth/**`, `/api/categories/**`, `/actuator/**`
+
+## Monitoring
+- Health check: `/actuator/health`
+- Metrics: `/actuator/metrics`
+- Liveness probe: `/actuator/health/liveness`
+- Readiness probe: `/actuator/health/readiness`
 ### Step 3: Create Azure Resources
 ```powershell
 # Create resource group

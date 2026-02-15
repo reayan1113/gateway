@@ -13,10 +13,6 @@ target/
 .git/
 .gitignore
 
-# Maven
-.mvn/
-mvnw
-mvnw.cmd
 
 # Documentation
 *.md
