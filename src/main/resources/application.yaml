@@ -15,6 +15,14 @@ spring:
           filters:
             - RewritePath=/api/auth/(?<segment>.*), /${segment}
 
+        # Auth Service - Admin Staff Management
+        - id: auth-service-admin
+          uri: ${AUTH_SERVICE_URL:http://localhost:8081}
+          predicates:
+            - Path=/api/admin/staff/**, /api/admin/users/**
+          filters:
+            - RewritePath=/api/admin/(?<segment>.*), /api/admin/${segment}
+
         # Menu Service
         - id: menu-service
           uri: ${MENU_SERVICE_URL:http://localhost:8082}
@@ -63,7 +71,7 @@ spring:
 
         # Analytics Service
         - id: analytics-service
-          uri: ${ANALYTICS_SERVICE_URL:http://analytics-service:8087}
+          uri: ${ANALYTICS_SERVICE_URL:http://analytics-service}
           predicates:
             - Path=/api/admin/analytics/**
           # filters:
@@ -76,7 +84,7 @@ spring:
             - Path=/api/kds/**
 
         - id: cart-service
-          uri: ${CART_SERVICE_URL:http://localhost:8083}
+          uri: ${CART_SERVICE_URL:http://cart-service}
           predicates:
             - Path=/api/cart/**
           filters:
@@ -86,7 +94,9 @@ spring:
       globalcors:
         corsConfigurations:
           '[/**]':
-            allowedOrigins: ${CORS_ALLOWED_ORIGINS:http://localhost:3000,http://localhost:3001}
+            allowedOrigins: ${CORS_ALLOWED_ORIGINS:http://localhost:3000,http://localhost:5005,http://localhost:3001}
+            allowedOriginPatterns:
+              - "https://*.vercel.app"
             allowedMethods:
               - GET
               - POST
@@ -99,6 +109,7 @@ spring:
             exposedHeaders:
               - X-Correlation-Id
               - X-Service-Name
+              - Authorization
             allowCredentials: true
             maxAge: 3600
 
