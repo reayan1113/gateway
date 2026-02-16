@@ -75,6 +75,13 @@ spring:
           predicates:
             - Path=/api/kds/**
 
+        - id: cart-service
+          uri: ${CART_SERVICE_URL:http://localhost:8083}
+          predicates:
+            - Path=/api/cart/**
+          filters:
+            - StripPrefix=0
+
       # Global CORS Configuration
       globalcors:
         corsConfigurations:
