@@ -63,9 +63,11 @@ spring:
 
         # Analytics Service
         - id: analytics-service
-          uri: ${ANALYTICS_SERVICE_URL:http://localhost:8084}
+          uri: ${ANALYTICS_SERVICE_URL:http://analytics-service:8087}
           predicates:
-            - Path=/api/analytics/**
+            - Path=/api/admin/analytics/**
+          # filters:
+          #   - StripPrefix=0 # Not strictly necessary as default is 0, ensures full path is sent
 
         # KDS Service
         - id: kds-service
@@ -99,7 +101,7 @@ jwt:
 
 # Public paths that don't require JWT (comma-separated)
 gateway:
-  public-paths: ${PUBLIC_PATHS:/api/auth/**,/api/categories/**,/api/menu/**,/api/media/**,/api/orders/active,/actuator/**}
+  public-paths: ${PUBLIC_PATHS:/api/auth/**,/api/categories/**,/api/menu/**,/api/media/**,/api/orders/active,/actuator/**,/api/admin/analytics/openapi.json}
 
 # Logging
 logging:
@@ -113,7 +115,7 @@ management:
   endpoints:
     web:
       exposure:
-        include: health,info,metrics
+        include: health,info,metrics,gateway
   endpoint:
     health:
       show-details: always
