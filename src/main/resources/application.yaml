@@ -7,13 +7,13 @@ spring:
   cloud:
     gateway:
       routes:
-        # Auth Service (Public - No JWT Required)
+        # Auth Service (Public & Profile)
         - id: auth-service
           uri: ${AUTH_SERVICE_URL:http://localhost:8081}
           predicates:
-            - Path=/api/auth/**
+            - Path=/api/auth/**, /api/profile/**
           filters:
-            - RewritePath=/api/auth/(?<segment>.*), /${segment}
+            - RewritePath=/api/(auth|profile)/(?<segment>.*), /${segment}
 
         # Auth Service - Admin Staff Management
         - id: auth-service-admin
