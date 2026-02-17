@@ -55,7 +55,7 @@ public class JwtAuthenticationFilter implements GlobalFilter, Ordered {
 
         // Skip JWT validation for public paths
         if (isPublicPath(path)) {
-            log.info("Skipping JWT validation for public path: {}", path);
+            log.debug("Skipping JWT validation for public path: {}", path);
             return chain.filter(exchange);
         }
 
