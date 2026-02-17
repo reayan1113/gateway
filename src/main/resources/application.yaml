@@ -136,7 +136,7 @@ spring:
 
 # JWT Configuration
 jwt:
-  secret: ${JWT_SECRET:7d31f0ead336068cac57f475bdb722e69bb452d2}
+  secret: ${JWT_SECRET:ue8yLJTAALbJn67rrh4lEGPLgl634dLEEIvRjVbemRFmgei9LggUKZjs/aSh9rvWGRBrze0Af5At6ywPsdO9+g==}
 
 # Public paths that don't require JWT (comma-separated)
 gateway:
