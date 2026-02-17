@@ -16,8 +16,12 @@ import org.springframework.util.AntPathMatcher;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
+import java.net.URI;
 import java.util.Arrays;
+import java.util.LinkedHashSet;
 import java.util.List;
+
+import org.springframework.cloud.gateway.support.ServerWebExchangeUtils;
 
 /**
  * Validate JWT token, extract claims, and validate tableId
@@ -52,7 +56,19 @@ public class JwtAuthenticationFilter implements GlobalFilter, Ordered {
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
         ServerHttpRequest request = exchange.getRequest();
+
+        // Get the original path BEFORE any RewritePath filters modify it
         String path = request.getPath().value();
+
+        // Try to get the original request URL from Gateway attributes (set before
+        // RewritePath)
+        LinkedHashSet<URI> originalUris = exchange
+                .getAttribute(ServerWebExchangeUtils.GATEWAY_ORIGINAL_REQUEST_URL_ATTR);
+        if (originalUris != null && !originalUris.isEmpty()) {
+            URI originalUri = originalUris.iterator().next();
+            path = originalUri.getPath();
+            log.debug("Using original path '{}' instead of rewritten path '{}'", path, request.getPath().value());
+        }
 
         // Skip JWT validation for public paths
         if (isPublicPath(path)) {

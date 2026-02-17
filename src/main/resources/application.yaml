@@ -12,56 +12,56 @@ spring:
           uri: ${AUTH_SERVICE_URL:http://localhost:8081}
           predicates:
             - Path=/api/auth/**, /api/profile/**
-          filters:
-            - RewritePath=/api/(auth|profile)/(?<segment>.*), /${segment}
+          # filters:
+          #   - RewritePath=/api/(auth|profile)/(?<segment>.*), /${segment}
 
         # Auth Service - Admin Staff Management
         - id: auth-service-admin
           uri: ${AUTH_SERVICE_URL:http://localhost:8081}
           predicates:
             - Path=/api/admin/staff/**, /api/admin/users/**
-          filters:
-            - RewritePath=/api/admin/(?<segment>.*), /api/admin/${segment}
+          # filters:
+          #   - RewritePath=/api/admin/(?<segment>.*), /api/admin/${segment}
 
         # Menu Service
         - id: menu-service
           uri: ${MENU_SERVICE_URL:http://localhost:8082}
           predicates:
             - Path=/api/menu/**
-          filters:
-            - RewritePath=/api/menu/(?<segment>.*), /api/menu/${segment}
+          # filters:
+          #   - RewritePath=/api/menu/(?<segment>.*), /api/menu/${segment}
 
         # Menu Service - Admin Menu
         - id: admin-menu-service
           uri: ${MENU_SERVICE_URL:http://localhost:8082}
           predicates:
             - Path=/api/admin/menu/**
-          filters:
-            - RewritePath=/api/admin/menu/(?<segment>.*), /api/admin/menu/${segment}
+          # filters:
+          #   - RewritePath=/api/admin/menu/(?<segment>.*), /api/admin/menu/${segment}
 
         # Category Service - Public (No Auth)
         - id: category-service-public
           uri: ${MENU_SERVICE_URL:http://localhost:8082}
           predicates:
             - Path=/api/categories/**
-          filters:
-            - RewritePath=/api/categories/(?<segment>.*), /api/categories/${segment}
+          # filters:
+          #   - RewritePath=/api/categories/(?<segment>.*), /api/categories/${segment}
 
         # Category Service - Admin
         - id: category-service-admin
           uri: ${MENU_SERVICE_URL:http://localhost:8082}
           predicates:
             - Path=/api/admin/categories/**
-          filters:
-            - RewritePath=/api/admin/categories/(?<segment>.*), /api/admin/categories/${segment}
+          # filters:
+          #   - RewritePath=/api/admin/categories/(?<segment>.*), /api/admin/categories/${segment}
 
         # Media Service (Menu Service)
         - id: media-service
           uri: ${MENU_SERVICE_URL:http://localhost:8082}
           predicates:
             - Path=/api/media/**
-          filters:
-            - RewritePath=/api/media/(?<segment>.*), /api/media/${segment}
+          # filters:
+          #   - RewritePath=/api/media/(?<segment>.*), /api/media/${segment}
 
         # Order Service
         - id: order-service
