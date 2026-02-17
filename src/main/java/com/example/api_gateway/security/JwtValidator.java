@@ -115,8 +115,8 @@ public class JwtValidator {
             case 1 -> "CUSTOMER";
             case 2 -> "ADMIN";
             case 3 -> "KITCHEN";
+            case 4 -> "WAITER";
             default -> "UNKNOWN";
         };
     }
 }
-

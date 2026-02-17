@@ -79,9 +79,27 @@ spring:
 
         # KDS Service
         - id: kds-service
-          uri: ${KDS_SERVICE_URL:http://localhost:8085}
+          uri: ${KDS_SERVICE_URL:https://kds-service.livelymeadow-4f6bca4e.centralindia.azurecontainerapps.io}
           predicates:
-            - Path=/api/kds/**
+            - Path=/api/kitchen/**
+          filters:
+            - StripPrefix=0
+
+        # Waiter Service
+        - id: waiter-service
+          uri: ${WAITER_SERVICE_URL:https://waiter-service.livelymeadow-4f6bca4e.centralindia.azurecontainerapps.io}
+          predicates:
+            - Path=/api/waiter/**
+          filters:
+            - StripPrefix=0
+
+        # Payment Service
+        - id: payment-service
+          uri: ${PAYMENT_SERVICE_URL:https://payment-service.livelymeadow-4f6bca4e.centralindia.azurecontainerapps.io}
+          predicates:
+            - Path=/payments/**
+          filters:
+            - StripPrefix=0
 
         - id: cart-service
           uri: ${CART_SERVICE_URL:http://cart-service}
@@ -119,7 +137,7 @@ jwt:
 
 # Public paths that don't require JWT (comma-separated)
 gateway:
-  public-paths: ${PUBLIC_PATHS:/api/auth/**,/api/categories/**,/api/menu/**,/api/media/**,/api/orders/active,/actuator/**,/api/admin/analytics/openapi.json}
+  public-paths: ${PUBLIC_PATHS:/api/auth/**,/api/categories/**,/api/menu/**,/api/media/**,/api/orders/active,/actuator/**,/api/admin/analytics/openapi.json,/api/waiter/health,/api/kitchen/health,/api/kitchen/debug/status,/api/waiter/debug/kafka,/payments/**}
 
 # Logging
 logging:
