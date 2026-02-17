@@ -39,7 +39,13 @@ public class JwtAuthenticationFilter implements GlobalFilter, Ordered {
             JwtValidator jwtValidator,
             @Value("${gateway.public-paths:/api/auth/**}") String publicPathsStr) {
         this.jwtValidator = jwtValidator;
-        this.publicPaths = Arrays.asList(publicPathsStr.split(","));
+        // Split, trim whitespace, and remove trailing slashes from each path
+        this.publicPaths = Arrays.stream(publicPathsStr.split(","))
+                .map(String::trim)
+                .map(path -> path.endsWith("/") && path.length() > 1 ? path.substring(0, path.length() - 1) : path)
+                .toList();
+        log.info("JwtAuthenticationFilter initialized with {} public paths", publicPaths.size());
+        publicPaths.forEach(path -> log.info("  Public path: '{}'", path));
     }
 
     @Override
@@ -49,7 +55,7 @@ public class JwtAuthenticationFilter implements GlobalFilter, Ordered {
 
         // Skip JWT validation for public paths
         if (isPublicPath(path)) {
-            log.debug("Skipping JWT validation for public path: {}", path);
+            log.info("Skipping JWT validation for public path: {}", path);
             return chain.filter(exchange);
         }
 
@@ -71,7 +77,8 @@ public class JwtAuthenticationFilter implements GlobalFilter, Ordered {
 
             log.debug("JWT validated - userId: {}, role: {}", userId, roleName);
 
-            // Extract tableId - Priority 1: JWT claims, Priority 2: Request (header/query param)
+            // Extract tableId - Priority 1: JWT claims, Priority 2: Request (header/query
+            // param)
             Long tableId = jwtValidator.extractTableId(claims);
             if (tableId == null) {
                 log.debug("TableId not found in JWT, checking request headers/params");
@@ -82,7 +89,8 @@ public class JwtAuthenticationFilter implements GlobalFilter, Ordered {
 
             if (tableId == null) {
                 log.warn("Missing tableId for protected path: {}", path);
-                throw new MissingClaimException("TableId must be present in JWT claims or X-Table-Id header/query parameter");
+                throw new MissingClaimException(
+                        "TableId must be present in JWT claims or X-Table-Id header/query parameter");
             }
 
             log.debug("Final tableId value: {}", tableId);
@@ -107,8 +115,20 @@ public class JwtAuthenticationFilter implements GlobalFilter, Ordered {
      * Check if the path is public (doesn't require JWT)
      */
     private boolean isPublicPath(String path) {
-        return publicPaths.stream()
-                .anyMatch(pattern -> pathMatcher.match(pattern, path));
+        boolean isPublic = publicPaths.stream()
+                .anyMatch(pattern -> {
+                    boolean matches = pathMatcher.match(pattern.trim(), path);
+                    if (matches) {
+                        log.debug("Path '{}' matched public pattern '{}'", path, pattern);
+                    }
+                    return matches;
+                });
+
+        if (!isPublic) {
+            log.debug("Path '{}' did not match any public patterns", path);
+        }
+
+        return isPublic;
     }
 
     /**
@@ -144,4 +164,3 @@ public class JwtAuthenticationFilter implements GlobalFilter, Ordered {
         return 3; // Execute after LoggingFilter
     }
 }
-
