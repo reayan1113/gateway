@@ -137,7 +137,7 @@ jwt:
 
 # Public paths that don't require JWT (comma-separated)
 gateway:
-  public-paths: ${PUBLIC_PATHS:/api/auth/**,/api/categories/**,/api/menu/**,/api/media/**,/api/orders/active,/actuator/**,/api/admin/analytics/openapi.json,/api/waiter/health,/api/kitchen/health,/api/kitchen/debug/status,/api/waiter/debug/kafka,/payments/**}
+  public-paths: ${PUBLIC_PATHS:/api/auth/login,/api/auth/register,/api/categories/**,/api/menu/**,/api/media/**,/api/orders/active,/actuator/**,/api/admin/analytics/openapi.json,/api/waiter/health,/api/kitchen/health,/api/kitchen/debug/status,/api/waiter/debug/kafka,/payments/**}
 
 # Logging
 logging:
