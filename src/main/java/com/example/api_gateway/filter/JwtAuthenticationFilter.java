@@ -39,13 +39,14 @@ public class JwtAuthenticationFilter implements GlobalFilter, Ordered {
             JwtValidator jwtValidator,
             @Value("${gateway.public-paths:/api/auth/**}") String publicPathsStr) {
         this.jwtValidator = jwtValidator;
-        // Split, trim whitespace, and remove trailing slashes from each path
-        this.publicPaths = Arrays.stream(publicPathsStr.split(","))
-                .map(String::trim)
-                .map(path -> path.endsWith("/") && path.length() > 1 ? path.substring(0, path.length() - 1) : path)
-                .toList();
+
+        // Debug: Log the raw environment variable value
+        log.debug("Raw PUBLIC_PATHS from environment: '{}'", publicPathsStr);
+
+        this.publicPaths = Arrays.asList(publicPathsStr.split(","));
+
         log.info("JwtAuthenticationFilter initialized with {} public paths", publicPaths.size());
-        publicPaths.forEach(path -> log.info("  Public path: '{}'", path));
+        publicPaths.forEach(path -> log.debug("  Public path: '{}'", path));
     }
 
     @Override
