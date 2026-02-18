@@ -109,10 +109,10 @@ public class JwtAuthenticationFilter implements GlobalFilter, Ordered {
                 log.debug("TableId extracted from JWT: {}", tableId);
             }
 
-            if (role == 1 && tableId == null) {
-                log.warn("Missing mandatory tableId for CUSTOMER on protected path: {}", path);
+            if (role == 1 && (tableId == null || tableId <= 0)) {
+                log.warn("Invalid or missing mandatory tableId ({}) for CUSTOMER on protected path: {}", tableId, path);
                 throw new MissingClaimException(
-                        "TableId must be present for Customers in JWT claims or X-Table-Id header/query parameter");
+                        "A valid TableId must be present for Customers in JWT claims or X-Table-Id header/query parameter");
             }
 
             if (tableId != null) {
