@@ -104,13 +104,15 @@ public class JwtAuthenticationFilter implements GlobalFilter, Ordered {
                 log.debug("TableId extracted from JWT: {}", tableId);
             }
 
-            if (tableId == null) {
-                log.warn("Missing tableId for protected path: {}", path);
+            if (role == 1 && tableId == null) {
+                log.warn("Missing mandatory tableId for CUSTOMER on protected path: {}", path);
                 throw new MissingClaimException(
-                        "TableId must be present in JWT claims or X-Table-Id header/query parameter");
+                        "TableId must be present for Customers in JWT claims or X-Table-Id header/query parameter");
             }
 
-            log.debug("Final tableId value: {}", tableId);
+            if (tableId != null) {
+                log.debug("Final tableId value: {}", tableId);
+            }
 
             // Store in exchange attributes for downstream filters
             exchange.getAttributes().put(USER_ID_ATTRIBUTE, userId);
