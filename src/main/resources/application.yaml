@@ -6,10 +6,13 @@ spring:
     name: api-gateway
   cloud:
     gateway:
+      default-filters:
+          - DedupeResponseHeader=Access-Control-Allow-Origin Access-Control-Allow-Credentials, RETAIN_FIRST
       routes:
+
         # Auth Service (Public & Profile)
         - id: auth-service
-          uri: ${AUTH_SERVICE_URL:http://localhost:8081}
+          uri: ${AUTH_SERVICE_URL:https://ishanka1102-auth-service.hf.space}
           predicates:
             - Path=/api/auth/**, /api/profile/**
           # filters:
@@ -108,13 +111,16 @@ spring:
           filters:
             - StripPrefix=0
 
-      # Global CORS Configuration
+
+      
+      
+
       globalcors:
         corsConfigurations:
           '[/**]':
-            # allowedOrigins: ${CORS_ALLOWED_ORIGINS:http://localhost:3000,http://localhost:5005,http://localhost:3001,https://no-18-restaurant-ms.vercel.app}
+            allowedOrigins: ${CORS_ALLOWED_ORIGINS:http://localhost:3000,http://localhost:5005,http://localhost:3001,https://no-18-restaurant-ms.vercel.app}
             allowedOriginPatterns:
-              - "*"
+              - "https://*.vercel.app"
             allowedMethods:
               - "*"
             allowedHeaders:
@@ -125,9 +131,10 @@ spring:
             allowCredentials: false
             maxAge: 3600
 
+
 # JWT Configuration
 jwt:
-  secret: ${JWT_SECRET:7d31f0ead336068cac57f475bdb722e69bb452d2}
+  secret: ${JWT_SECRET:ue8yLJTAALbJn67rrh4lEGPLgl634dLEEIvRjVbemRFmgei9LggUKZjs/aSh9rvWGRBrze0Af5At6ywPsdO9+g==}
 
 # Public paths that don't require JWT (comma-separated)
 gateway:
