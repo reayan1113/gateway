@@ -57,6 +57,11 @@ public class JwtAuthenticationFilter implements GlobalFilter, Ordered {
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
         ServerHttpRequest request = exchange.getRequest();
 
+        // Allow OPTIONS requests for CORS preflight
+        if (request.getMethod().name().equalsIgnoreCase("OPTIONS")) {
+            return chain.filter(exchange);
+        }
+
         // Get the original path BEFORE any RewritePath filters modify it
         String path = request.getPath().value();
 
