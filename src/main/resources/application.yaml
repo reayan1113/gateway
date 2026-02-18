@@ -111,6 +111,18 @@ spring:
           filters:
             - StripPrefix=0
 
+        # Promotion Service
+        - id: promotion-service
+          uri: ${PROMOTION_SERVICE_URL:http://promotion-service}
+          predicates:
+            - Path=/api/promotion/**
+
+        # Promotion Service - Admin
+        - id: promotion-service-admin
+          uri: ${PROMOTION_SERVICE_URL:http://promotion-service}
+          predicates:
+            - Path=/api/admin/promotion/**
+
 
       
       
